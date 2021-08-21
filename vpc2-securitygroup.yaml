@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  vpc2StackName: #ParameterKey
+    Description: 'Name of your vpc2 CFN Stack'
+    Type: String
+    Default: 'vpc2' #vpc2 stackname 
+Resources: 
+  vpc2customSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: 'mystratocloud -master vpc2 Custom Security Group'
+      SecurityGroupIngress: #inbound rule
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: '0.0.0.0/0'
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: '0.0.0.0/0'
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: '0.0.0.0/0'
+        - IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+          CidrIp: '0.0.0.0/0'
+      VpcId:
+        Fn::ImportValue:
+          !Sub ${vpc2StackName}-VPCID #refer to vpc2.yaml output 
+      Tags:
+        - Key: 'Name'
+          Value: 'mystratocloud  Master vpc2 Security Group'
+Outputs:
+  vpc2customSecurityGroupID: #logicalID
+    Description: 'mystratocloud  Master vpc2 SecurityGroup ID'
+    Value:
+      !Ref vpc2customSecurityGroup # the vaule of export is here
+    Export:
+      Name:
+        !Sub ${AWS::StackName}-vpc2SecurityGroupID # the name of infra-stack export

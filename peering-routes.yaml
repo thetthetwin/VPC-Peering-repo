@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  vpc1StackName: #ParameterKey
+    Description: 'Name of your vpc1 CFN Stack'
+    Type: String
+    Default: 'vpc1'
+  vpc2StackName: #ParameterKey
+    Description: 'Name of your vpc2 CFN Stack'
+    Type: String
+    Default: 'vpc2'
+  peeringStackName: #ParameterKey
+    Description: 'Name of your peering CFN Stack'
+    Type: String
+    Default: 'peering'
+Resources:
+  peeringRouteVPC1:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock:
+        Fn::ImportValue:
+          !Sub ${vpc2StackName}-vpc2CidrBlock
+      RouteTableId:
+        Fn::ImportValue:
+          !Sub ${vpc1StackName}-routeTableID
+      VpcPeeringConnectionId:
+        Fn::ImportValue:
+          !Sub ${peeringStackName}-peeringConnectionID
+  peeringRouteVPC2:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock:
+        Fn::ImportValue:
+          !Sub ${vpc1StackName}-vpc1CidrBlock
+      RouteTableId:
+        Fn::ImportValue:
+          !Sub ${vpc2StackName}-routeTableID
+      VpcPeeringConnectionId:
+        Fn::ImportValue:
+          !Sub ${peeringStackName}-peeringConnectionID
